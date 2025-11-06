@@ -37,6 +37,7 @@ bool takeCarAction = false; // Sets the state of the child window
 bool smallCarParking[20] = {};
 bool bigCarParking[8] = {};
 bool fullParking = false;
+bool advancedCarParking = false;
 
 // Main code
 int main(int, char**)
@@ -152,13 +153,21 @@ int main(int, char**)
         ImGui::SetNextWindowPos(ImVec2(0, 0));
         if (ImGui::Begin("Sistema Estacionamiento UP", &opened, ImGuiWindowFlags_NoResize || ImGuiWindowFlags_NoMove || ImGuiWindowFlags_NoCollapse)) { // Starts the first window
 
-            if (ImGui::Button("Estacionar Carro", ImVec2(300, 50))) { // Button to open Park Car menu
+            if (ImGui::Button("Estacionar Carro (Recomendado)", ImVec2(300, 50))) { // Button to open Park Car menu
                 takeCarAction = false; // Close the other menu if open
+                advancedCarParking = false; // Close the other menu if open
                 parkCarAction = true; // Opens the menu
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Estacionar Carro Avanzado", ImVec2(300, 50))) {
+                takeCarAction = false; // Close the other menu if open
+                parkCarAction = false; // Close the other menu if open
+                advancedCarParking = true; // Opens the advance car parking menu
             }
             ImGui::SameLine();
             if (ImGui::Button("Retirar Carro", ImVec2(300, 50))) { // Button to open Take Car menu
                 parkCarAction = false; // Close the other menu if open
+                advancedCarParking = false; // Close the other menu if open
                 takeCarAction = true; // Opens the menu
             }
             ImGui::SameLine();
@@ -211,24 +220,84 @@ int main(int, char**)
                     }
                 } ImGui::EndChild();
             }
+
+            if (advancedCarParking == true) {
+                if (ImGui::BeginChild("Estacionar carro avanzado", ImVec2(1280, 600), true)) {
+                    ImGui::Text("Plazas pequenas");
+                    for (int i = 1; i <= 20; i++) {
+                        std::string carNumber = "Carrito\n" + std::to_string(i); // Converts the into to a string
+                        std::string emptyCarNumber = "Libre\nPequeno\n" + std::to_string(i); // Converts the into to a string
+                        if (smallCarParking[i - 1] == 1) {
+                            ImGui::BeginDisabled(); // Starts the next elements as disabled, not being abled to be interacted with
+                            if (ImGui::Button(carNumber.c_str(), ImVec2(100, 50))) {
+
+                            }ImGui::EndDisabled(); // Ends the block for all the interactivity
+                        }
+                        else {
+                            if (ImGui::Button(emptyCarNumber.c_str(), ImVec2(100, 50))) {
+                                smallCarParking[i - 1] = 1; // Returns the space to available
+                                
+                            }
+                        }
+                        if (i % 10 == 0) {
+                            ImGui::NewLine(); // If there is a group of 10, enter a space
+                        }
+                        else {
+                            ImGui::SameLine(); // Puts the two buttons next to each other
+                        }
+
+                    }
+                    ImGui::NewLine();
+                    ImGui::Text("Plazas Grandes");
+                    for (int j = 1; j <= 8; j++) {
+                        std::string carNumber = "Carrote\n" + std::to_string(j); // Converts the into to a string
+                        std::string emptyCarNumber = "Libre\nGrande\n" + std::to_string(j); // Converts the into to a string
+                        if (bigCarParking[j - 1] == 1) {
+                            ImGui::BeginDisabled(); // Starts the next elements as disabled, not being abled to be interacted with
+                            if (ImGui::Button(carNumber.c_str(), ImVec2(200, 100))) {
+                                
+
+                            }ImGui::EndDisabled(); // Ends the block for all the interactivity
+                        }
+                        else {
+                            if (ImGui::Button(emptyCarNumber.c_str(), ImVec2(200, 100))) {
+                                bigCarParking[j - 1] = 1; // Returns the space to available
+                                
+                            }
+                        }
+                        if (j % 5 == 0) {
+                            ImGui::NewLine();
+                        }
+                        else {
+                            ImGui::SameLine();
+                        }
+
+                    }
+                    ImGui::NewLine();
+                    if (ImGui::Button("Cerrar Ventana")) {
+                        advancedCarParking = false; // Closes the Park Car Windows
+                    }
+                } ImGui::EndChild();
+            }
         
 
                 if (takeCarAction == true) {
                     if (ImGui::BeginChild("Retirar Carro", ImVec2(1280, 600), true)) {
                         ImGui::Text("Plazas pequenas");
                         for (int i = 1; i <= 20; i++) {
-                            std::string carNumber = "Carro " + std::to_string(i); // Converts the into to a string
+                            std::string carNumber = "Carrito\n" + std::to_string(i); // Converts the into to a string
+                            std::string emptyCarNumber = "Libre\nPequeno\n" + std::to_string(i); // Converts the into to a string
                             if (smallCarParking[i-1] == 0) {
                                 ImGui::BeginDisabled(); // Starts the next elements as disabled, not being abled to be interacted with
-                                if (ImGui::Button(carNumber.c_str(), ImVec2(100, 50))) {
-                                    takeCarAction = false; // Closes the Take Car Windows
+                                if (ImGui::Button(emptyCarNumber.c_str(), ImVec2(100, 50))) {
+                                    
 
                                 }ImGui::EndDisabled(); // Ends the block for all the interactivity
                             }
                             else {
                                 if (ImGui::Button(carNumber.c_str(),  ImVec2(100, 50))) {
                                     smallCarParking[i-1] = 0; // Returns the space to available
-                                    takeCarAction = false; // Closes the Take Car Windows
+                                    
                                 }
                             }
                             if (i % 10 == 0) {
@@ -241,18 +310,19 @@ int main(int, char**)
                         ImGui::NewLine();
                         ImGui::Text("Plazas Grandes");
                         for (int j = 1; j <= 8; j++) {
-                            std::string carNumber = "Carrote " + std::to_string(j); // Converts the into to a string
+                            std::string carNumber = "Carrote\n" + std::to_string(j); // Converts the into to a string
+                            std::string emptyCarNumber = "Libre\nGrande\n" + std::to_string(j); // Converts the into to a string
                             if (bigCarParking[j - 1] == 0) {
                                 ImGui::BeginDisabled(); // Starts the next elements as disabled, not being abled to be interacted with
-                                if (ImGui::Button(carNumber.c_str(), ImVec2(200, 100))) {
-                                    takeCarAction = false; // Closes the Take Car Windows
+                                if (ImGui::Button(emptyCarNumber.c_str(), ImVec2(200, 100))) {
+                                    
 
                                 }ImGui::EndDisabled(); // Ends the block for all the interactivity
                             }
                             else {
                                 if (ImGui::Button(carNumber.c_str(), ImVec2(200, 100))) {
                                     bigCarParking[j - 1] = 0; // Returns the space to available
-                                    takeCarAction = false; // Closes the Take Car Windows
+                                    
                                 }
                             }
                             if (j % 5 == 0) {
@@ -262,6 +332,10 @@ int main(int, char**)
                                 ImGui::SameLine();
                             }
 
+                        }
+                        ImGui::NewLine();
+                        if (ImGui::Button("Cerrar Ventana")) {
+                            takeCarAction = false; // Closes the Park Car Windows
                         }
                     } ImGui::EndChild();
                 }
